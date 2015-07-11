@@ -7,7 +7,7 @@
 // use this if you want to recursively match all subfolders:
 // 'test/spec/**/*.js'
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
@@ -34,7 +34,7 @@ module.exports = function (grunt) {
       },
       js: {
         files: ['<%= config.app %>/scripts/{,*/}*.js'],
-        tasks: ['jshint'],
+        tasks: ['jscs'],
         options: {
           livereload: '<%= connect.options.livereload %>'
         }
@@ -66,8 +66,7 @@ module.exports = function (grunt) {
     connect: {
       options: {
         port: 9000,
-        livereload: 35729,
-        // change this to '0.0.0.0' to access the server from outside
+        livereload: 35729, // change this to '0.0.0.0' to access the server from outside
         hostname: 'localhost'
       },
       chrome: {
@@ -91,8 +90,7 @@ module.exports = function (grunt) {
 
     // Empties folders to start fresh
     clean: {
-      chrome: {
-      },
+      chrome: {},
       dist: {
         files: [{
           dot: true,
@@ -105,18 +103,19 @@ module.exports = function (grunt) {
     },
 
     // Make sure code styles are up to par and there are no obvious mistakes
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc',
-        reporter: require('jshint-stylish')
-      },
-      all: [
+    jscs: {
+      src: [
         'Gruntfile.js',
         '<%= config.app %>/scripts/{,*/}*.js',
         '!<%= config.app %>/scripts/vendor/*',
         'test/spec/{,*/}*.js'
-      ]
+      ],
+      options: {
+        config: '.jscsrc',
+        requireCurlyBraces: ['if']
+      }
     },
+
     mocha: {
       all: {
         options: {
@@ -240,7 +239,7 @@ module.exports = function (grunt) {
             '{,*/}*.html',
             'styles/{,*/}*.css',
             'styles/fonts/{,*/}*.*',
-            '_locales/{,*/}*.json',
+            '_locales/{,*/}*.json'
           ]
         }]
       }
@@ -248,14 +247,12 @@ module.exports = function (grunt) {
 
     // Run some tasks in parallel to speed up build process
     concurrent: {
-      chrome: [
-      ],
+      chrome: [],
       dist: [
         'imagemin',
         'svgmin'
       ],
-      test: [
-      ]
+      test: []
     },
 
     // Auto buildnumber, exclude debug files. smart builds that event pages
@@ -295,9 +292,9 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('debug', function () {
+  grunt.registerTask('debug', function() {
     grunt.task.run([
-      'jshint',
+      'jscs',
       'concurrent:chrome',
       'connect:chrome',
       'watch'
@@ -313,8 +310,7 @@ module.exports = function (grunt) {
     'clean:dist',
     'chromeManifest:dist',
     'useminPrepare',
-    'concurrent:dist',
-    // No UI feature selected, cssmin task will be commented
+    'concurrent:dist', // No UI feature selected, cssmin task will be commented
     // 'cssmin',
     'concat',
     'uglify',
@@ -324,7 +320,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'jshint',
+    'jscs',
     'test',
     'build'
   ]);
